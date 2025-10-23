@@ -1,0 +1,28 @@
+package se331.labubu.service;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import se331.labubu.dao.UserDao;
+import se331.labubu.entity.User;
+
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class UserServiceImpl implements UserService {
+    final UserDao userDao;
+
+    @Override
+    @Transactional
+    public User save(User user) {
+        return userDao.save(user);
+    }
+
+    @Override
+    @Transactional
+    public User findByUsername(String username) {
+        return userDao.findByUsername(username);
+    }
+}

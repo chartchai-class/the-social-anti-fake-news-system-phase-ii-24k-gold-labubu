@@ -1,0 +1,30 @@
+spring:
+  application:
+    security:
+      enable: false
+    name: 331-backend
+  profiles:
+    active:
+      - db
+  datasource:
+    url: jdbc:mysql://localhost:3307/selabdb?createDatabaseIfNotExists=true&autoReconnect=true&characterEncoding=UTF-8&allowMultiQueries=true&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: password
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: create-drop
+  servlet:
+    multipart:
+      max-file-size: 10MB
+supabase:
+  storage:
+    endpoint: https://aotchtwolsmxywyutdka.storage.supabase.co/storage/v1/s3
+    endpoint_output: https://aotchtwolsmxywyutdka.storage.supabase.co/storage/v1/object/public
+    bucket: test
+    region: ap-southeast-1
+    accessKey: ca763a14af1b7590437beab86533f9ae
+    secretKey: a8be5e4a8c9335287d923c49a07b284fde7ca109a867444bc432268340cdbea0
