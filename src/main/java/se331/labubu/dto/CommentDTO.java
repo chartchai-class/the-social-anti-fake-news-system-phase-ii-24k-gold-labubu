@@ -4,11 +4,10 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class VoteDTO {
+public class CommentDTO {
     private Long id;
     private UserDTO user;
-    private Boolean isFake;
-    private String comment;
+    private String content;
     private String imageUrl;
     private LocalDateTime createdAt;
     private Boolean isDeleted;

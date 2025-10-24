@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.*;
 
 @Data
 @Builder
@@ -11,8 +12,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RegisterRequest {
 
-  private String firstname;
-  private String lastname;
+  @NotBlank(message = "Name is required")
+  private String name;
+
+  @NotBlank(message = "Surname is required")
+  private String surname;
+
+  @NotBlank(message = "Email is required")
+  @Email(message = "Email should be valid")
   private String email;
+
+  @NotBlank(message = "Password is required")
+  @Size(min = 6, message = "Password must be at least 6 characters")
   private String password;
+
+  private String profileImage;
 }

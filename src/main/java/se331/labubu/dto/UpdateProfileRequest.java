@@ -1,14 +1,10 @@
 package se331.labubu.dto;
 
 import lombok.Data;
-import se331.labubu.entity.Role;
 
 @Data
-public class UserDTO {
-    private Long id;
+public class UpdateProfileRequest {
     private String name;
     private String surname;
-    private String email;
-    private Role role;
     private String profileImage;
 }

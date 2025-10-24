@@ -21,42 +21,62 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "_user")
+@Table(name = "user")
 public class User implements UserDetails {
 
   @Id
-  @GeneratedValue
-  private Integer id;
-  private String parentId;
-  private String firstname;
-  private String lastname;
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  private String name;
+  private String surname;
+
   @Column(unique = true)
-  private String username;
   private String email;
   private String password;
-  private Boolean enabled;
 
   @Enumerated(EnumType.STRING)
-  @ElementCollection
-  @Builder.Default
-  @LazyCollection(LazyCollectionOption.FALSE)
-  private List<Role> roles = new ArrayList<>();
+  private Role role;
+  private String profileImage;
+
+//  @ElementCollection
+//  @Builder.Default
+//  @LazyCollection(LazyCollectionOption.FALSE)
+//  private List<Role> roles = new ArrayList<>();
+
+//  @OneToMany(mappedBy = "user")
+//  private List<Token> tokens;
+
+//  @OneToMany(mappedBy = "reporter")
+//  private List<News> newsReported;
 
   @OneToMany(mappedBy = "user")
-  private List<Token> tokens;
+  private List<Vote> votes;
+
+  @OneToMany(mappedBy = "user")
+  private List<Comment> comments;
+
+  // UserDetails methods for Spring Security
+//  @Override
+//  public Collection<? extends GrantedAuthority> getAuthorities() {
+//    return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+//  }
+
+  // UserDetails methods for Spring Security
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return roles.stream().map(role -> new SimpleGrantedAuthority(role.name())).collect(Collectors.toList());
+//    return roles.stream().map(role -> new SimpleGrantedAuthority(role.name())).collect(Collectors.toList());
+    return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+  }
+
+  @Override
+  public String getUsername() {
+    return email;
   }
 
   @Override
   public String getPassword() {
     return password;
-  }
-
-  @Override
-  public String getUsername() {
-    return username;
   }
 
   @Override
@@ -76,6 +96,6 @@ public class User implements UserDetails {
 
   @Override
   public boolean isEnabled() {
-    return enabled;
+    return true;
   }
 }
