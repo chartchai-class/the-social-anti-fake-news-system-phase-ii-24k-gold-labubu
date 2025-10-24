@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import se331.labubu.entity.Event;
 import se331.labubu.repository.EventRepository;
 
 @Repository

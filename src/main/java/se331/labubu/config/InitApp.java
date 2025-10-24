@@ -7,11 +7,7 @@ import org.springframework.context.ApplicationListener;
 //import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 //import se331.lab.entity.*;
-import se331.labubu.entity.Event;
-import se331.labubu.entity.Organizer;
-import se331.labubu.entity.Participant;
 import se331.labubu.repository.EventRepository;
-import se331.labubu.repository.OrganizerRepository;
 import se331.labubu.repository.ParticipantRepository;
 //import se331.lab.entity.Role;
 //import se331.lab.repository.UserRepository;
@@ -24,9 +20,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InitApp implements ApplicationListener<ApplicationReadyEvent> {
 
-    final EventRepository eventRepository;
-    final OrganizerRepository organizerRepository;
-    final ParticipantRepository participantRepository;
+//    final EventRepository eventRepository;
+//    final OrganizerRepository organizerRepository;
+//    final ParticipantRepository participantRepository;
 //    final UserRepository userRepository;
 //    final PasswordEncoder passwordEncoder;
 
@@ -35,9 +31,9 @@ public class InitApp implements ApplicationListener<ApplicationReadyEvent> {
     public void onApplicationEvent(ApplicationReadyEvent event) {
 
         // ลบข้อมูลเก่าทั้งหมด
-        eventRepository.deleteAll();
-        organizerRepository.deleteAll();
-        participantRepository.deleteAll();
+//        eventRepository.deleteAll();
+//        organizerRepository.deleteAll();
+//        participantRepository.deleteAll();
 //        userRepository.deleteAll();
 
         // Add Users

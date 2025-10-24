@@ -1,7 +1,9 @@
+// Register, Login (public)
 package se331.labubu.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,29 +22,36 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class AuthenticationController {
 
-  private final AuthenticationService service;
+  private final AuthenticationService authService;
 
+  // Register - everyone becomes READER initially
   @PostMapping("/register")
   public ResponseEntity<AuthenticationResponse> register(
-      @RequestBody RegisterRequest request
+      @Valid @RequestBody RegisterRequest request
   ) {
-    return ResponseEntity.ok(service.register(request));
+    return ResponseEntity.ok(authService.register(request));
   }
+  /////////////////////////////////////////////////
+  @PostMapping("/login")
+  public ResponseEntity<AuthenticationResponse> login(
+          @Valid @RequestBody AuthenticationRequest request
+  ) {
+    return ResponseEntity.ok(authService.authenticate(request));
+  }
+  /////////////////////////////////////////////////
   @PostMapping("/authenticate")
   public ResponseEntity<AuthenticationResponse> authenticate(
       @RequestBody AuthenticationRequest request
   ) {
-    AuthenticationResponse result = service.authenticate(request);
+    AuthenticationResponse result = authService.authenticate(request);
     return ResponseEntity.ok(result);
   }
 
-  @PostMapping("/refresh-token")
-  public void refreshToken(
-      HttpServletRequest request,
-      HttpServletResponse response
-  ) throws IOException {
-    service.refreshToken(request, response);
-  }
-
-
+//  @PostMapping("/refresh-token")
+//  public void refreshToken(
+//      HttpServletRequest request,
+//      HttpServletResponse response
+//  ) throws IOException {
+//    authService.refreshToken(request, response);
+//  }
 }
