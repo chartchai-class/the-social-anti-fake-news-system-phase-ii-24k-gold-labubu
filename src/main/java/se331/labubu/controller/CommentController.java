@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import se331.labubu.dto.CommentDTO;
+import se331.labubu.dto.CommentRequest;
 import se331.labubu.entity.User;
 import se331.labubu.service.CommentService;
 

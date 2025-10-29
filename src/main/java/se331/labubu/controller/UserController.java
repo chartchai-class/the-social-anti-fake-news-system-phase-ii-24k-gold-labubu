@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import se331.labubu.dto.UpdateProfileRequest;
 import se331.labubu.dto.UserDTO;
 import se331.labubu.entity.User;
 import se331.labubu.service.UserService;
@@ -15,6 +16,10 @@ import se331.labubu.service.UserService;
 public class UserController {
 
     private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     // GET current user profile
     @GetMapping("/me")

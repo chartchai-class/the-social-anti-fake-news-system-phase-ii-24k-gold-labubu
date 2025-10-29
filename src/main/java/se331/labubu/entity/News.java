@@ -30,7 +30,7 @@ public class News {
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private NewsType status = NewsType.PENDING;
+    private NewsType status = NewsType.REAL;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_id", nullable = false)
@@ -74,10 +74,8 @@ public class News {
 
         if (fakeCount > realCount) {
             this.status = NewsType.FAKE;
-        } else if (realCount > fakeCount) {
-            this.status = NewsType.REAL;
         } else {
-            this.status = NewsType.PENDING;
+            this.status = NewsType.REAL;
         }
     }
 }

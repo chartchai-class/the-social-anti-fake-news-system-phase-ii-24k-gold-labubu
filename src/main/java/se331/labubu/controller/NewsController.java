@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import se331.labubu.dto.NewsDTO;
+import se331.labubu.dto.NewsRequest;
 import se331.labubu.entity.User;
 import se331.labubu.service.NewsService;
 
@@ -28,7 +29,7 @@ public class NewsController {
     public ResponseEntity<Page<NewsDTO>> getAllNews(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String status, // "FAKE", "REAL", "PENDING"
+            @RequestParam(required = false) String status,
             @RequestParam(required = false) String search,
             @AuthenticationPrincipal User currentUser // null if not logged in
     ) {

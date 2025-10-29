@@ -2,11 +2,10 @@ package se331.labubu.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import se331.labubu.dao.UserDao;
+import se331.labubu.dto.UpdateProfileRequest;
 import se331.labubu.dto.UserDTO;
 import se331.labubu.entity.Role;
 import se331.labubu.entity.User;
@@ -62,6 +61,16 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         return LabMapper.INSTANCE.getUserDTO(user);
+    }
+
+    @Override
+    public UserDTO downgradeToReader(Long userId) {
+        return null;
+    }
+
+    @Override
+    public UserDTO changeRole(Long userId, Role newRole) {
+        return null;
     }
 
     //Update user profile

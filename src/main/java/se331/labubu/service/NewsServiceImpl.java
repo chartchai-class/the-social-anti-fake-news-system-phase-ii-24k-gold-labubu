@@ -31,14 +31,14 @@ public class NewsServiceImpl implements NewsService {
         if (search != null && !search.trim().isEmpty()) {
             // Search with optional status filter
             if (status != null && !status.trim().isEmpty()) {
-                NewsStatus newsStatus = NewsStatus.valueOf(status.toUpperCase());
+                NewsType newsStatus = NewsType.valueOf(status.toUpperCase());
                 newsPage = newsRepository.searchNewsByStatus(search, newsStatus, pageable);
             } else {
                 newsPage = newsRepository.searchNews(search, pageable);
             }
         } else if (status != null && !status.trim().isEmpty()) {
             // Filter by status only
-            NewsStatus newsStatus = NewsStatus.valueOf(status.toUpperCase());
+            NewsType newsStatus = NewsType.valueOf(status.toUpperCase());
             newsPage = newsRepository.findByStatusAndIsDeletedFalse(newsStatus, pageable);
         } else {
             // Show all news
@@ -90,7 +90,7 @@ public class NewsServiceImpl implements NewsService {
                 .details(request.getDetails())
                 .imageUrl(request.getImageUrl())
                 .reporter(currentUser)
-                .status(NewsStatus.PENDING)
+                .status(NewsType.REAL)
                 .isDeleted(false)
                 .build();
 
@@ -108,5 +108,10 @@ public class NewsServiceImpl implements NewsService {
 
         news.setIsDeleted(true);
         newsRepository.save(news);
+    }
+
+    @Override
+    public NewsDTO restoreNews(Long newsId) {
+        return null;
     }
 }

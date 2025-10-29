@@ -10,20 +10,16 @@ import se331.labubu.entity.*;
 public interface LabMapper {
     LabMapper INSTANCE = Mappers.getMapper(LabMapper.class);
 
-    // User mappings
-    @Mapping(target = "password", ignore = true)
+    // User mappings - no @Mapping needed if password isn't in UserDTO
     UserDTO getUserDTO(User user);
 
     // News mappings
-    @Mapping(target = "reporter", source = "reporter")
     NewsDTO getNewsDTO(News news);
 
     // Vote mappings
-    @Mapping(target = "user", source = "user")
     VoteDTO getVoteDTO(Vote vote);
 
     // Comment mappings
-    @Mapping(target = "user", source = "user")
     CommentDTO getCommentDTO(Comment comment);
 }
 

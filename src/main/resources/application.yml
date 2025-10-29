@@ -17,6 +17,11 @@ spring:
   application:
     security:
       enable: false
+      jwt:
+        secret-key: 0d5133b90cec79a7f84583d7f9a97c8fa50ca55ed1353db02bf273aaab944dd06dd5a98626480f44fe5498f93bcb15949f389d13d77b89af89fef3643e8c56b5
+        expiration: 86400000
+        refresh-token:
+          expiration: 604800000
     name: 331-backend
   profiles:
     active:
