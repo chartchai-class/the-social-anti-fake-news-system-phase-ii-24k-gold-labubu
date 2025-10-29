@@ -41,7 +41,8 @@ public class InitApp implements ApplicationListener<ApplicationReadyEvent> {
                 "admin@antifakenews.com",
                 "admin123",
                 Role.ADMIN,
-                "https://i.pravatar.cc/150?img=1"
+                "https://i.pravatar.cc/150?img=1",
+                "adminUser"
         );
 
         User member1 = createUser(
@@ -49,7 +50,8 @@ public class InitApp implements ApplicationListener<ApplicationReadyEvent> {
                 "john@example.com",
                 "password123",
                 Role.MEMBER,
-                "https://i.pravatar.cc/150?img=2"
+                "https://i.pravatar.cc/150?img=2",
+                "john_doe"
         );
 
         User member2 = createUser(
@@ -57,7 +59,8 @@ public class InitApp implements ApplicationListener<ApplicationReadyEvent> {
                 "jane@example.com",
                 "password123",
                 Role.MEMBER,
-                "https://i.pravatar.cc/150?img=3"
+                "https://i.pravatar.cc/150?img=3",
+                "jane_smith"
         );
 
         User reader1 = createUser(
@@ -65,7 +68,8 @@ public class InitApp implements ApplicationListener<ApplicationReadyEvent> {
                 "bob@example.com",
                 "password123",
                 Role.READER,
-                "https://i.pravatar.cc/150?img=4"
+                "https://i.pravatar.cc/150?img=4",
+                "bob_johnson"
         );
 
         User reader2 = createUser(
@@ -73,7 +77,8 @@ public class InitApp implements ApplicationListener<ApplicationReadyEvent> {
                 "alice@example.com",
                 "password123",
                 Role.READER,
-                "https://i.pravatar.cc/150?img=5"
+                "https://i.pravatar.cc/150?img=5",
+                "alice_brown"
         );
 
         User reader3 = createUser(
@@ -81,8 +86,10 @@ public class InitApp implements ApplicationListener<ApplicationReadyEvent> {
                 "charlie@example.com",
                 "password123",
                 Role.READER,
-                "https://i.pravatar.cc/150?img=6"
+                "https://i.pravatar.cc/150?img=6",
+                "charlie_wilson"
         );
+
 
         // 2. Create News Articles
         News news1 = createNews(
@@ -232,10 +239,11 @@ public class InitApp implements ApplicationListener<ApplicationReadyEvent> {
     }
 
     private User createUser(String name, String surname, String email,
-                            String password, Role role, String profileImage) {
+                            String password, Role role, String profileImage, String username) {
         User user = User.builder()
                 .name(name)
                 .surname(surname)
+                .username(username)
                 .email(email)
                 .password(passwordEncoder.encode(password))
                 .role(role)

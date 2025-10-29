@@ -31,12 +31,17 @@ public class User implements UserDetails {
   private String name;
   private String surname;
 
+  @Column(unique = true, nullable = true)
+  private String username;  // Added username field
+
   @Column(unique = true)
   private String email;
+
   private String password;
 
   @Enumerated(EnumType.STRING)
   private Role role;
+
   private String profileImage;
 
 //  @ElementCollection
@@ -57,12 +62,6 @@ public class User implements UserDetails {
   private List<Comment> comments;
 
   // UserDetails methods for Spring Security
-//  @Override
-//  public Collection<? extends GrantedAuthority> getAuthorities() {
-//    return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
-//  }
-
-  // UserDetails methods for Spring Security
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
 //    return roles.stream().map(role -> new SimpleGrantedAuthority(role.name())).collect(Collectors.toList());
@@ -71,7 +70,7 @@ public class User implements UserDetails {
 
   @Override
   public String getUsername() {
-    return email;
+    return username;  // Changed to return username instead of email
   }
 
   @Override
