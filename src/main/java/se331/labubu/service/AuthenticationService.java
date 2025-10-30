@@ -139,4 +139,15 @@ public class AuthenticationService {
       }
     }
   }
+
+  // Add this method to your AuthenticationService class
+
+  public void logout(String token) {
+    var storedToken = tokenRepository.findByToken(token).orElse(null);
+    if (storedToken != null) {
+      storedToken.setExpired(true);
+      storedToken.setRevoked(true);
+      tokenRepository.save(storedToken);
+    }
+  }
 }
