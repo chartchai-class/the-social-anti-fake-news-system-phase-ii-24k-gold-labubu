@@ -39,8 +39,8 @@ public class SecurityConfig {
                                 "/api/v1/auth/authenticate"
                         ).permitAll()
 
-                        // News endpoints - require authentication
-                        .requestMatchers("/api/news/**").authenticated()
+                        // News endpoints - CHANGED TO PUBLIC ACCESS
+                        .requestMatchers("/api/news/**").permitAll()
 
                         // Vote endpoints - require authentication
                         .requestMatchers("/api/votes/**").authenticated()
