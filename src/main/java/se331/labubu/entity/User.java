@@ -70,7 +70,7 @@ public class User implements UserDetails {
 
   @Override
   public String getUsername() {
-    return username;  // Changed to return username instead of email
+    return email;  // Changed to return username instead of email
   }
 
   @Override
