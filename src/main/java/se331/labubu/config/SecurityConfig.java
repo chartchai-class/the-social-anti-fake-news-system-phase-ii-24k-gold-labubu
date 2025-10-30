@@ -18,7 +18,7 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // Enable @PreAuthorize
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -31,15 +31,21 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints - no authentication required
+                        // Public auth endpoints - no authentication required
                         .requestMatchers(
-                                "/api/v1/auth/**",
                                 "/api/v1/auth/register",
                                 "/api/v1/auth/login",
-                                "/api/v1/auth/authenticate"
+                                "/api/v1/auth/authenticate",
+                                "/api/v1/auth/refresh-token"
                         ).permitAll()
 
-                        // News endpoints - CHANGED TO PUBLIC ACCESS
+                        // Protected auth endpoints - require authentication
+                        .requestMatchers(
+                                "/api/v1/auth/me",
+                                "/api/v1/auth/logout"
+                        ).authenticated()
+
+                        // News endpoints - public access
                         .requestMatchers("/api/news/**").permitAll()
 
                         // Vote endpoints - require authentication
@@ -48,7 +54,7 @@ public class SecurityConfig {
                         // Comment endpoints - require authentication
                         .requestMatchers("/api/comments/**").authenticated()
 
-                        // Admin only endpoints (if you have any)
+                        // Admin only endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                         // All other requests require authentication
@@ -66,7 +72,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:3000"));
+        // FIXED: Added localhost:5174 to allowed origins
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:5173",
+                "http://localhost:5174",  // <-- YOUR FRONTEND PORT
+                "http://localhost:3000"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

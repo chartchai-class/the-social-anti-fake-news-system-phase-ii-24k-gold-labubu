@@ -33,20 +33,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
           @NonNull FilterChain filterChain
   ) throws ServletException, IOException {
 
-    if (request.getServletPath().contains("/api/v1/auth")) {
+    // Skip JWT validation only for public auth endpoints
+    String path = request.getServletPath();
+    if (path.equals("/api/v1/auth/register") ||
+            path.equals("/api/v1/auth/login") ||
+            path.equals("/api/v1/auth/authenticate") ||
+            path.equals("/api/v1/auth/refresh-token")) {
+      System.out.println("Skipping JWT validation for public endpoint: " + path);
       filterChain.doFilter(request, response);
       return;
     }
+
     final String authHeader = request.getHeader("Authorization");
     final String jwt;
     final String userEmail;
-    if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
-      System.out.println("No auth header or doesn't start with Bearer");
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      System.out.println("No auth header or doesn't start with Bearer for path: " + path);
       filterChain.doFilter(request, response);
       return;
     }
     jwt = authHeader.substring(7);
-    System.out.println("JWT Token: " + jwt);
+    System.out.println("JWT Token received for path: " + path);
+    System.out.println("JWT Token: " + jwt.substring(0, Math.min(20, jwt.length())) + "...");
 
     try {
       userEmail = jwtService.extractUsername(jwt);
@@ -79,9 +87,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                   new WebAuthenticationDetailsSource().buildDetails(request)
           );
           SecurityContextHolder.getContext().setAuthentication(authToken);
-          System.out.println("Authentication successful!");
+          System.out.println("Authentication successful for: " + userEmail);
         } else {
           System.out.println("Authentication FAILED - Token validation failed");
+          System.out.println("JWT valid: " + jwtService.isTokenValid(jwt, userDetails));
+          System.out.println("Token in DB valid: " + isTokenValid);
         }
       }
     } catch (Exception e) {
