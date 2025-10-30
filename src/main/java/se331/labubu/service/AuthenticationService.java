@@ -71,8 +71,8 @@ public class AuthenticationService {
     );
 
     // Try to find by username first, if not found try by email
-    var user = userRepository.findByUsername(request.getUsername())
-            .or(() -> userRepository.findByEmail(request.getUsername()))
+    var user = userRepository.findByEmail(identifier)
+            .or(() -> userRepository.findByUsername(identifier))
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
     var jwtToken = jwtService.generateToken(user);
