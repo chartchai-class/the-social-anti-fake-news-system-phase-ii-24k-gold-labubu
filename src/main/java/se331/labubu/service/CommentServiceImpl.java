@@ -13,7 +13,8 @@ import se331.labubu.entity.Role;
 import se331.labubu.entity.User;
 import se331.labubu.repository.CommentRepository;
 import se331.labubu.repository.NewsRepository;
-import se331.labubu.util.LabMapper;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -25,58 +26,87 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Page<CommentDTO> getCommentsByNewsId(Long newsId, Pageable pageable, User currentUser) {
         News news = newsRepository.findById(newsId)
-                .orElseThrow(() -> new IllegalArgumentException("News not found"));
+                .orElseThrow(() -> new RuntimeException("News not found"));
 
-        // Admin can see deleted comments
         Page<Comment> comments;
+
+        // Admin sees all comments (including deleted)
         if (currentUser != null && currentUser.getRole() == Role.ADMIN) {
-            comments = commentRepository.findByNews(news, pageable);
+            comments = commentRepository.findByNewsId(newsId, pageable);
         } else {
-            comments = commentRepository.findByNewsAndIsDeletedFalse(news, pageable);
+            // Regular users only see non-deleted comments
+            comments = commentRepository.findByNewsIdAndIsDeletedFalse(newsId, pageable);
         }
 
-        return comments.map(LabMapper.INSTANCE::getCommentDTO);
+        return comments.map(this::convertToDTO);
     }
 
     @Override
     @Transactional
     public CommentDTO addComment(Long newsId, CommentRequest request, User currentUser) {
         News news = newsRepository.findById(newsId)
-                .orElseThrow(() -> new IllegalArgumentException("News not found"));
+                .orElseThrow(() -> new RuntimeException("News not found"));
 
-        // Check if news is deleted
-        if (news.getIsDeleted()) {
-            throw new IllegalArgumentException("Cannot comment on deleted news");
+        // Validate vote value
+        if (!request.getVote().equals("fake") && !request.getVote().equals("not-fake")) {
+            throw new RuntimeException("Invalid vote value. Must be 'fake' or 'not-fake'");
         }
 
         Comment comment = Comment.builder()
                 .news(news)
                 .user(currentUser)
                 .content(request.getContent())
+                .vote(request.getVote())
                 .imageUrl(request.getImageUrl())
+                .createdAt(LocalDateTime.now())
                 .isDeleted(false)
                 .build();
 
-        commentRepository.save(comment);
+        Comment savedComment = commentRepository.save(comment);
 
-        return LabMapper.INSTANCE.getCommentDTO(comment);
+        // Update news status based on new vote
+        news.updateStatus();
+        newsRepository.save(news);
+
+        return convertToDTO(savedComment);
     }
 
     @Override
     @Transactional
     public void softDeleteComment(Long commentId, Long newsId) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
 
-        // Verify comment belongs to the news
         if (!comment.getNews().getId().equals(newsId)) {
-            throw new IllegalArgumentException("Comment does not belong to this news");
+            throw new RuntimeException("Comment does not belong to this news");
         }
 
         comment.setIsDeleted(true);
         commentRepository.save(comment);
 
-        // If this was a vote comment, recalculate news status
-        // (This is already handled by Vote entity)
+        // Update news status after deleting comment (vote is removed)
+        News news = comment.getNews();
+        news.updateStatus();
+        newsRepository.save(news);
+    }
+
+    private CommentDTO convertToDTO(Comment comment) {
+        return CommentDTO.builder()
+                .id(comment.getId())
+                .newsId(comment.getNews().getId())
+                .user(CommentDTO.UserDTO.builder()
+                        .id(comment.getUser().getId())
+                        .username(comment.getUser().getUsername())
+                        .name(comment.getUser().getName())
+                        .surname(comment.getUser().getSurname())
+                        .profileImage(comment.getUser().getProfileImage())
+                        .role(comment.getUser().getRole().name())
+                        .build())
+                .content(comment.getContent())
+                .vote(comment.getVote())
+                .imageUrl(comment.getImageUrl())
+                .createdAt(comment.getCreatedAt())
+                .isDeleted(comment.getIsDeleted())
+                .build();
     }
 }

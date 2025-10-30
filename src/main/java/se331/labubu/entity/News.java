@@ -1,16 +1,19 @@
 package se331.labubu.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Builder
 @Entity
 @NoArgsConstructor
@@ -26,13 +29,14 @@ public class News {
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String details;
+
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private NewsType status = NewsType.REAL;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "reporter_id", nullable = false)
     private User reporter;
 
@@ -43,40 +47,56 @@ public class News {
     @Builder.Default
     private Boolean isDeleted = false;
 
-    @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonManagedReference
     @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<Vote> votes = new ArrayList<>();
-
-    // Calculate fake vote count (excluding deleted votes)
+    // Calculate fake vote count from comments (excluding deleted comments)
     @Transient
     public long getFakeVoteCount() {
-        return votes.stream()
-                .filter(v -> v.getIsFake() && !v.getIsDeleted())
+        return comments.stream()
+                .filter(c -> !c.getIsDeleted())
+                .filter(c -> "fake".equals(c.getVote()))
                 .count();
     }
 
-    // Calculate real vote count (excluding deleted votes)
+    // Calculate real vote count from comments (excluding deleted comments)
     @Transient
     public long getRealVoteCount() {
-        return votes.stream()
-                .filter(v -> !v.getIsFake() && !v.getIsDeleted())
+        return comments.stream()
+                .filter(c -> !c.getIsDeleted())
+                .filter(c -> "not-fake".equals(c.getVote()))
                 .count();
     }
 
-    // Auto-update status based on votes
+    // Get total vote count
+    @Transient
+    public long getTotalVoteCount() {
+        return getFakeVoteCount() + getRealVoteCount();
+    }
+
+    // Auto-update status based on votes from comments
     public void updateStatus() {
         long fakeCount = getFakeVoteCount();
         long realCount = getRealVoteCount();
+        long totalVotes = fakeCount + realCount;
 
-        if (fakeCount > realCount) {
+        if (totalVotes == 0) {
+            this.status = NewsType.REAL; // Default if no votes
+            return;
+        }
+
+        // Calculate percentage
+        double fakePercentage = (double) fakeCount / totalVotes * 100;
+
+        if (fakePercentage >= 60) {
             this.status = NewsType.FAKE;
+        } else if (fakePercentage <= 40) {
+            this.status = NewsType.REAL;
         } else {
+            // Between 40-60% is uncertain, default to REAL or add UNVERIFIED status
             this.status = NewsType.REAL;
         }
     }
 }
-

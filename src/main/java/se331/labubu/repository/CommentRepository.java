@@ -13,4 +13,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     // Find all comments by news (including deleted, for admin)
     Page<Comment> findByNews(News news, Pageable pageable);
+
+    Page<Comment> findByNewsId(Long newsId, Pageable pageable);
+
+    Page<Comment> findByNewsIdAndIsDeletedFalse(Long newsId, Pageable pageable);
 }

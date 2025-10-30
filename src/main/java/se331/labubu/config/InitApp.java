@@ -10,8 +10,6 @@ import se331.labubu.entity.*;
 import se331.labubu.repository.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -19,7 +17,6 @@ public class InitApp implements ApplicationListener<ApplicationReadyEvent> {
 
     private final UserRepository userRepository;
     private final NewsRepository newsRepository;
-    private final VoteRepository voteRepository;
     private final CommentRepository commentRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -28,7 +25,6 @@ public class InitApp implements ApplicationListener<ApplicationReadyEvent> {
     public void onApplicationEvent(ApplicationReadyEvent event) {
 
         // Clear existing data
-        voteRepository.deleteAll();
         commentRepository.deleteAll();
         newsRepository.deleteAll();
         userRepository.deleteAll();
@@ -89,7 +85,6 @@ public class InitApp implements ApplicationListener<ApplicationReadyEvent> {
                 "https://i.pravatar.cc/150?img=6",
                 "charlie_wilson"
         );
-
 
         // 2. Create News Articles
         News news1 = createNews(
@@ -164,74 +159,67 @@ public class InitApp implements ApplicationListener<ApplicationReadyEvent> {
                 LocalDateTime.now().minusHours(2)
         );
 
-        // 3. Create Votes (this will automatically update news status)
-        // News 1 (REAL) - More real votes
-        createVote(news1, reader1, false, "This is well-documented. I saw this on multiple credible news sites.", null);
-        createVote(news1, reader2, false, "My doctor mentioned this technology. It's real.", null);
-        createVote(news1, member2, false, "Verified with the research institution.", null);
-        createVote(news1, reader3, true, "Sounds too good to be true.", null);
+        // 3. Create Comments with Votes (combined - matching db.json structure)
 
-        // News 2 (FAKE) - More fake votes
-        createVote(news2, reader1, true, "No official government announcement. This is clearly fake.", null);
-        createVote(news2, reader2, true, "Checked official channels. Nothing there. Fake news!", null);
-        createVote(news2, reader3, true, "Classic misinformation tactic.", null);
-        createVote(news2, member1, false, "Could be real, governments do this.", null);
+        // News 1 (REAL) - More "not-fake" votes through comments
+        createCommentWithVote(news1, reader1, "This is well-documented. I saw this on multiple credible news sites.", "not-fake", null);
+        createCommentWithVote(news1, reader2, "My doctor mentioned this technology. It's real.", "not-fake", null);
+        createCommentWithVote(news1, member2, "Verified with the research institution.", "not-fake", null);
+        createCommentWithVote(news1, reader3, "Sounds too good to be true.", "fake", null);
+        createCommentWithVote(news1, reader1, "This is amazing news for healthcare!", "not-fake", null);
+        createCommentWithVote(news1, member2, "Can't wait to see this implemented in our hospitals.", "not-fake", null);
 
-        // News 3 (REAL) - More real votes
-        createVote(news3, reader1, false, "I attended the ceremony. It's real!", null);
-        createVote(news3, reader2, false, "Official university announcement confirms this.", null);
-        createVote(news3, reader3, false, "Great news for our university!", null);
+        // News 2 (FAKE) - More "fake" votes through comments
+        createCommentWithVote(news2, reader1, "No official government announcement. This is clearly fake.", "fake", null);
+        createCommentWithVote(news2, reader2, "Checked official channels. Nothing there. Fake news!", "fake", null);
+        createCommentWithVote(news2, reader3, "Classic misinformation tactic.", "fake", null);
+        createCommentWithVote(news2, member1, "Could be real, governments do this.", "not-fake", null);
+        createCommentWithVote(news2, reader2, "Please verify before sharing such claims!", "fake", null);
+        createCommentWithVote(news2, reader3, "This kind of fake news creates unnecessary panic.", "fake", null);
 
-        // News 4 (FAKE) - More fake votes
-        createVote(news4, reader1, true, "Medical professionals debunked this. Dangerous misinformation!", null);
-        createVote(news4, reader2, true, "No scientific evidence. Definitely fake.", null);
-        createVote(news4, member1, true, "This could harm people. Should be removed.", null);
-        createVote(news4, reader3, true, "Snake oil claims. Pure fake.", null);
+        // News 3 (REAL) - More "not-fake" votes through comments
+        createCommentWithVote(news3, reader1, "I attended the ceremony. It's real!", "not-fake", null);
+        createCommentWithVote(news3, reader2, "Official university announcement confirms this.", "not-fake", null);
+        createCommentWithVote(news3, reader3, "Great news for our university!", "not-fake", null);
+        createCommentWithVote(news3, member1, "Proud of our research team!", "not-fake", null);
+        createCommentWithVote(news3, reader1, "Well deserved recognition!", "not-fake", null);
 
-        // News 5 (REAL) - More real votes
-        createVote(news5, reader1, false, "Saw the buses being prepared. It's happening!", null);
-        createVote(news5, reader2, false, "Official announcement on city website.", null);
-        createVote(news5, reader3, false, "Finally! Been waiting for this.", null);
+        // News 4 (FAKE) - More "fake" votes through comments
+        createCommentWithVote(news4, reader1, "Medical professionals debunked this. Dangerous misinformation!", "fake", null);
+        createCommentWithVote(news4, reader2, "No scientific evidence. Definitely fake.", "fake", null);
+        createCommentWithVote(news4, member1, "This could harm people. Should be removed.", "fake", null);
+        createCommentWithVote(news4, reader3, "Snake oil claims. Pure fake.", "fake", null);
+        createCommentWithVote(news4, reader1, "This is dangerous misinformation that could harm people.", "fake", null);
+        createCommentWithVote(news4, admin, "We're monitoring this closely. Thank you for reporting.", "fake", null);
 
-        // News 6 (FAKE) - More fake votes
-        createVote(news6, reader1, true, "Celebrity posted on their social media. They're alive. This is fake!", null);
-        createVote(news6, reader2, true, "Hoax confirmed by multiple fact-checkers.", null);
-        createVote(news6, member2, true, "Typical death hoax. Happens all the time.", null);
+        // News 5 (REAL) - More "not-fake" votes through comments
+        createCommentWithVote(news5, reader1, "Saw the buses being prepared. It's happening!", "not-fake", null);
+        createCommentWithVote(news5, reader2, "Official announcement on city website.", "not-fake", null);
+        createCommentWithVote(news5, reader3, "Finally! Been waiting for this.", "not-fake", null);
+        createCommentWithVote(news5, reader2, "Finally some good infrastructure news!", "not-fake", null);
+        createCommentWithVote(news5, reader3, "What are the new bus routes?", "not-fake", null);
 
-        // News 7 (REAL) - More real votes
-        createVote(news7, reader1, false, "Official weather bureau warning. Take it seriously!", null);
-        createVote(news7, reader2, false, "Weather apps confirm the storm. Real!", null);
+        // News 6 (FAKE) - More "fake" votes through comments
+        createCommentWithVote(news6, reader1, "Celebrity posted on their social media. They're alive. This is fake!", "fake", null);
+        createCommentWithVote(news6, reader2, "Hoax confirmed by multiple fact-checkers.", "fake", null);
+        createCommentWithVote(news6, member2, "Typical death hoax. Happens all the time.", "fake", null);
 
-        // News 8 (REAL) - Mixed votes
-        createVote(news8, reader1, true, "Probably just drones or planes.", null);
-        createVote(news8, reader2, false, "I saw it too! Something strange was definitely there.", null);
+        // News 7 (REAL) - More "not-fake" votes through comments
+        createCommentWithVote(news7, reader1, "Official weather bureau warning. Take it seriously!", "not-fake", null);
+        createCommentWithVote(news7, reader2, "Weather apps confirm the storm. Real!", "not-fake", null);
 
-        // 4. Create Comments (separate from votes)
-        createComment(news1, reader1, "This is amazing news for healthcare!", null);
-        createComment(news1, member2, "Can't wait to see this implemented in our hospitals.", null);
-
-        createComment(news2, reader2, "Please verify before sharing such claims!", null);
-        createComment(news2, reader3, "This kind of fake news creates unnecessary panic.", null);
-
-        createComment(news3, member1, "Proud of our research team!", null);
-        createComment(news3, reader1, "Well deserved recognition!", null);
-
-        createComment(news4, reader1, "This is dangerous misinformation that could harm people.", null);
-        createComment(news4, admin, "We're monitoring this closely. Thank you for reporting.", null);
-
-        createComment(news5, reader2, "Finally some good infrastructure news!", null);
-        createComment(news5, reader3, "What are the new bus routes?", null);
-
-        createComment(news8, reader1, "Need more evidence before making conclusions.", null);
-        createComment(news8, reader2, "I have photos! How can I share them?", null);
+        // News 8 (MIXED) - Mixed votes through comments
+        createCommentWithVote(news8, reader1, "Probably just drones or planes.", "fake", null);
+        createCommentWithVote(news8, reader2, "I saw it too! Something strange was definitely there.", "not-fake", null);
+        createCommentWithVote(news8, reader1, "Need more evidence before making conclusions.", "fake", null);
+        createCommentWithVote(news8, reader2, "I have photos! How can I share them?", "not-fake", null);
 
         // Print summary
         System.out.println("✅ Data initialized successfully!");
         System.out.println("📊 Created " + userRepository.count() + " users");
         System.out.println("   - 1 Admin, 2 Members, 3 Readers");
         System.out.println("📰 Created " + newsRepository.count() + " news articles");
-        System.out.println("🗳️ Created " + voteRepository.count() + " votes");
-        System.out.println("💬 Created " + commentRepository.count() + " comments");
+        System.out.println("💬 Created " + commentRepository.count() + " comments (with votes)");
         System.out.println("\n📋 Sample Login Credentials:");
         System.out.println("   Admin: admin@antifakenews.com / admin123");
         System.out.println("   Member: john@example.com / password123");
@@ -266,34 +254,25 @@ public class InitApp implements ApplicationListener<ApplicationReadyEvent> {
         return newsRepository.save(news);
     }
 
-    private Vote createVote(News news, User user, Boolean isFake,
-                            String comment, String imageUrl) {
-        Vote vote = Vote.builder()
-                .news(news)
-                .user(user)
-                .isFake(isFake)
-                .comment(comment)
-                .imageUrl(imageUrl)
-                .isDeleted(false)
-                .build();
-
-        Vote savedVote = voteRepository.save(vote);
-
-        // Update news status based on votes
-        news.updateStatus();
-        newsRepository.save(news);
-
-        return savedVote;
-    }
-
-    private Comment createComment(News news, User user, String content, String imageUrl) {
+    // NEW METHOD: Create comment with vote combined (matches db.json structure)
+    private Comment createCommentWithVote(News news, User user, String content,
+                                          String vote, String imageUrl) {
         Comment comment = Comment.builder()
                 .news(news)
                 .user(user)
                 .content(content)
+                .vote(vote) // "fake" or "not-fake"
                 .imageUrl(imageUrl)
                 .isDeleted(false)
+                .createdAt(LocalDateTime.now())
                 .build();
-        return commentRepository.save(comment);
+
+        Comment savedComment = commentRepository.save(comment);
+
+        // Update news status based on all comments' votes
+        news.updateStatus();
+        newsRepository.save(news);
+
+        return savedComment;
     }
 }

@@ -1,4 +1,3 @@
-// CRUD comments (role-based access)
 package se331.labubu.controller;
 
 import jakarta.validation.Valid;
@@ -37,7 +36,7 @@ public class CommentController {
         return ResponseEntity.ok(comments);
     }
 
-    // POST comment - READER, MEMBER, ADMIN can comment
+    // POST comment with vote - READER, MEMBER, ADMIN can comment
     @PostMapping
     @PreAuthorize("hasAnyRole('READER', 'MEMBER', 'ADMIN')")
     public ResponseEntity<CommentDTO> addComment(
