@@ -6,8 +6,8 @@ spring:
     cors:
       allowed-origins:
         - http://localhost:5173
-        - http://localhost:5174  # ADD THIS LINE
-        - http://localhost:5175  # ADD THIS LINE
+        - http://localhost:5174
+        - http://localhost:5175
         - http://localhost:3000
       allowed-methods:
         - GET
@@ -23,10 +23,10 @@ spring:
     active:
       - db
   datasource:
-    url: jdbc:mysql://localhost:3307/db?createDatabaseIfNotExists=true&autoReconnect=true&characterEncoding=UTF-8&allowMultiQueries=true&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true
+    url: ${DATABASE_URL:jdbc:mysql://host.docker.internal:3307/db?createDatabaseIfNotExists=true&autoReconnect=true&characterEncoding=UTF-8&allowMultiQueries=true&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: password
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
   jpa:
     properties:
       hibernate:
@@ -41,16 +41,16 @@ spring:
 application:
   security:
     jwt:
-      secret-key: 609c0a90fef8f8761f886ee56989371e22eaa81f467ad628878a82656fe47a647caab2a6aee59ac66529106f86a72a36a45dc259231344e52e2b48b1a3703b0e
+      secret-key: ${JWT_SECRET:609c0a90fef8f8761f886ee56989371e22eaa81f467ad628878a82656fe47a647caab2a6aee59ac66529106f86a72a36a45dc259231344e52e2b48b1a3703b0e}
       expiration: 86400000
       refresh-token:
         expiration: 604800000
 
 supabase:
   storage:
-    endpoint: https://aotchtwolsmxywyutdka.storage.supabase.co/storage/v1/s3
-    endpoint_output: https://aotchtwolsmxywyutdka.storage.supabase.co/storage/v1/object/public
-    bucket: test
-    region: ap-southeast-1
-    accessKey: ca763a14af1b7590437beab86533f9ae
-    secretKey: a8be5e4a8c9335287d923c49a07b284fde7ca109a867444bc432268340cdbea0
+    endpoint: ${SUPABASE_ENDPOINT:https://aotchtwolsmxywyutdka.storage.supabase.co/storage/v1/s3}
+    endpoint_output: ${SUPABASE_ENDPOINT_OUTPUT:https://aotchtwolsmxywyutdka.storage.supabase.co/storage/v1/object/public}
+    bucket: ${SUPABASE_BUCKET:test}
+    region: ${SUPABASE_REGION:ap-southeast-1}
+    accessKey: ${SUPABASE_ACCESS_KEY:ca763a14af1b7590437beab86533f9ae}
+    secretKey: ${SUPABASE_SECRET_KEY:a8be5e4a8c9335287d923c49a07b284fde7ca109a867444bc432268340cdbea0}
