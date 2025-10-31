@@ -30,6 +30,8 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
+                // In your SecurityConfig.java, update the authorizeHttpRequests section:
+
                 .authorizeHttpRequests(auth -> auth
                         // Public auth endpoints - no authentication required
                         .requestMatchers(
@@ -53,6 +55,11 @@ public class SecurityConfig {
 
                         // Comment endpoints - require authentication
                         .requestMatchers("/api/comments/**").authenticated()
+
+                        // User endpoints - specific rules
+                        .requestMatchers("/api/users/me").authenticated()
+                        .requestMatchers("/api/users/{userId}").permitAll()
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
 
                         // Admin only endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

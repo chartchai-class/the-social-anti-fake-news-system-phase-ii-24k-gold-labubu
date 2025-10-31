@@ -12,6 +12,9 @@ import se331.labubu.entity.User;
 import se331.labubu.repository.UserRepository;
 import se331.labubu.util.LabMapper;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -45,6 +48,59 @@ public class UserServiceImpl implements UserService {
         }
         return users.map(LabMapper.INSTANCE::getUserDTO);
     }
+
+    // ==================== NEW ADMIN METHODS ====================
+
+    /**
+     * Get all users without pagination (Admin only)
+     */
+    @Override
+    public List<UserDTO> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(LabMapper.INSTANCE::getUserDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Update user role (Admin only)
+     */
+    @Override
+    @Transactional
+    public UserDTO updateUserRole(Long userId, String roleString) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        // Convert string to Role enum
+        Role role;
+        try {
+            role = Role.valueOf(roleString.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid role: " + roleString + ". Valid roles are: ADMIN, MEMBER, READER");
+        }
+
+        user.setRole(role);
+        User updatedUser = userRepository.save(user);
+        return LabMapper.INSTANCE.getUserDTO(updatedUser);
+    }
+
+    /**
+     * Delete user (Admin only)
+     */
+    @Override
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        // Prevent deleting admin users for safety
+        if (user.getRole() == Role.ADMIN) {
+            throw new IllegalArgumentException("Cannot delete admin users");
+        }
+
+        userRepository.delete(user);
+    }
+
+    // ==================== EXISTING METHODS ====================
 
     //Upgrade reader to member
     @Override
