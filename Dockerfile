@@ -1,8 +1,20 @@
-FROM eclipse-temurin:21-jdk-alpine
-
+# Build stage
+FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
 
-COPY target/lab-0.0.1-SNAPSHOT.jar app.jar
+# Copy Maven files
+COPY pom.xml .
+COPY src ./src
+
+# Build the application
+RUN ./mvnw clean package -DskipTests || mvn clean package -DskipTests
+
+# Run stage
+FROM eclipse-temurin:21-jdk-alpine
+WORKDIR /app
+
+# Copy the built JAR (using wildcard to avoid name issues)
+COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8081
 
