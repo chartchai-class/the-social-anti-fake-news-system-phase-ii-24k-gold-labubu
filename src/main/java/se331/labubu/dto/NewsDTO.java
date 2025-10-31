@@ -3,6 +3,7 @@ package se331.labubu.dto;
 import lombok.Data;
 import se331.labubu.entity.NewsType;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class NewsDTO {
@@ -16,4 +17,6 @@ public class NewsDTO {
     private Boolean isDeleted;
     private long fakeVoteCount;
     private long realVoteCount;
+    //Include comments in the DTO
+    private List<CommentDTO> comments;
 }

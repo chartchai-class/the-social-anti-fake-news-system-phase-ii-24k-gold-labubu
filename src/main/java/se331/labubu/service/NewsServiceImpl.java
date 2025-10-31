@@ -32,21 +32,27 @@ public class NewsServiceImpl implements NewsService {
             // Search with optional status filter
             if (status != null && !status.trim().isEmpty()) {
                 NewsType newsStatus = NewsType.valueOf(status.toUpperCase());
-                newsPage = newsRepository.searchNewsByStatus(search, newsStatus, pageable);
+                // Use admin version if admin, regular version otherwise
+                newsPage = isAdmin
+                        ? newsRepository.searchNewsByStatusAll(search, newsStatus, pageable)
+                        : newsRepository.searchNewsByStatus(search, newsStatus, pageable);
             } else {
-                newsPage = newsRepository.searchNews(search, pageable);
+                // Search all fields
+                newsPage = isAdmin
+                        ? newsRepository.searchNewsAll(search, pageable)
+                        : newsRepository.searchNews(search, pageable);
             }
         } else if (status != null && !status.trim().isEmpty()) {
             // Filter by status only
             NewsType newsStatus = NewsType.valueOf(status.toUpperCase());
-            newsPage = newsRepository.findByStatusAndIsDeletedFalse(newsStatus, pageable);
+            newsPage = isAdmin
+                    ? newsRepository.findByStatus(newsStatus, pageable)
+                    : newsRepository.findByStatusAndIsDeletedFalse(newsStatus, pageable);
         } else {
             // Show all news
-            if (isAdmin) {
-                newsPage = newsRepository.findAll(pageable);
-            } else {
-                newsPage = newsRepository.findByIsDeletedFalse(pageable);
-            }
+            newsPage = isAdmin
+                    ? newsRepository.findAll(pageable)
+                    : newsRepository.findByIsDeletedFalse(pageable);
         }
 
         return newsPage.map(news -> {
