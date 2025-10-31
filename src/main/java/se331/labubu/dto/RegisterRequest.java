@@ -28,3 +28,4 @@ public class RegisterRequest {
 
   private String profileImage;
 }
+
